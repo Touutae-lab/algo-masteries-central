@@ -1,0 +1,1 @@
+pnpx migrate  --migrations-dir ./DB/migration

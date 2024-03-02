@@ -1,29 +1,30 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import { DatabaseService } from './db.service';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
+
+export const DatabaseConnection = "DATABASE_CONNECTION"
 @Module({
     imports: [ConfigModule],
-    providers: [
-        {
-            provide: DatabaseService,
-            useFactory: async (configService: ConfigService) => {
-                const db = drizzle(postgres, {
-                    host: configService.get('DB_HOST'),
-                    port: configService.get('DB_PORT'),
-                    database: configService.get('DB_DATABASE'),
-                    user: configService.get('DB_USER'),
-                    password: configService.get('DB_PASSWORD')
-                });
-                await db.connect();
-                return db;
-            },
-            inject: [ConfigService]
-        }
-    ],
-    exports: [DatabaseService]
+    providers: [{
+        provide: DatabaseConnection,
+        useFactory: async (configService: ConfigService) => {
+            const queryClient = postgres(configService.get<string>('DATABASE_URL'), {
+                ssl: {
+                    rejectUnauthorized: false
+                },
+                user: configService.get<string>('DATABASE_USER'),
+                password: configService.get<string>('DATABASE_PASSWORD'),
+                max: 20
+            });
+            const db = drizzle(queryClient);
+            return db;
+        },
+        inject: [ConfigService],
+    }],
+    exports: [DatabaseConnection]
 })
 
-export class DbModule {};
+
+export class DatabaseModule {}

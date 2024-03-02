@@ -1,24 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { DatabaseConnection } from 'src/db/db.module';
+import {users} from './entities/user.entity';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
-
+  constructor(@Inject(DatabaseConnection ) private db: PostgresJsDatabase) {}
   findAll() {
-    return `This action returns all users`;
+    return this.db.select().from(users).execute();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.db.select({id: users.id}).from(users).where(eq(users.id, id)).execute();
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
 
   remove(id: number) {
     return `This action removes a #${id} user`;

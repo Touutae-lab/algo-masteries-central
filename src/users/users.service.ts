@@ -17,6 +17,6 @@ export class UsersService {
 
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.db.delete(users).where(eq(users.id, id)).execute();
   }
 }

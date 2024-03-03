@@ -17,7 +17,7 @@ async function runMigrations() {
   const db = drizzle(queryClient);
 
   // Specify the migrations folder path relative to the root of your project
-  await migrate(db, { migrationsFolder: './src/db/migrations' })
+  await migrate(db, { migrationsFolder: '../../infrastructure/db/migration' })
       .then(() => console.log('Migrations complete!'))
       .catch(err => console.error('Migrations failed!', err));
 }
